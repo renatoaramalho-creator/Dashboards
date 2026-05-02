@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dashboard de Estoque – Estaiada Beira Rio</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f1923;color:#e8dfc8;font-family:Arial,sans-serif;min-height:100vh}
+.wrap{padding:0 0 2rem}
+.header{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.5rem;border-bottom:1px solid #2a3545}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-circle{width:42px;height:42px;border-radius:50%;background:#c9a84c;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#0f1923;flex-shrink:0}
+.logo-text h1{font-size:16px;font-weight:600;color:#e8dfc8}
+.logo-text p{font-size:11px;color:#7a8fa6;margin-top:2px}
+.header-title{font-size:12px;color:#c9a84c;letter-spacing:0.08em;font-weight:600}
+.section{padding:1rem 1.5rem}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.25rem}
+.card{background:#1a2535;border:0.5px solid #2a3a4f;border-radius:8px;padding:1rem 1.25rem}
+.card-label{font-size:10px;color:#7a8fa6;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px}
+.card-value{font-size:26px;font-weight:600;color:#e8dfc8}
+.card-value.alert{color:#e84c4c}
+.card-value.warn{color:#e8834c}
+.card-sub{font-size:11px;color:#7a8fa6;margin-top:4px}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25rem}
+.chart-panel{background:#1a2535;border:0.5px solid #2a3a4f;border-radius:8px;padding:1rem 1.25rem}
+.panel-title{font-size:11px;color:#c9a84c;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:12px;padding-left:8px;border-left:2px solid #c9a84c}
+.table-panel{background:#1a2535;border:0.5px solid #2a3a4f;border-radius:8px;padding:1rem 1.25rem;margin-bottom:1.25rem}
+.filters{display:flex;gap:8px;margin-bottom:12px}
+.filter-btn{background:#243040;border:0.5px solid #c9a84c;border-radius:4px;color:#c9a84c;font-size:11px;padding:6px 12px;cursor:pointer}
+.inv-table{width:100%;border-collapse:collapse;font-size:12px}
+.inv-table th{color:#7a8fa6;font-weight:600;text-align:left;padding:6px 8px;border-bottom:0.5px solid #2a3a4f;font-size:10px;letter-spacing:0.05em;text-transform:uppercase}
+.inv-table td{padding:7px 8px;border-bottom:0.5px solid #1e2d3e;color:#c8d4e0}
+.inv-table td.gold{color:#c9a84c;font-weight:600}
+.badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:3px;font-weight:600}
+.badge-crit{background:#4a1515;color:#f07070}
+.badge-prox{background:#4a3010;color:#e8a050}
+.badge-ok{background:#0f2e1a;color:#50c878}
+.badge-vista{background:#1a2d40;color:#6a9fc0}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.bar-label{font-size:11px;color:#c8d4e0;min-width:110px;text-align:right}
+.bar-track{flex:1;background:#243040;border-radius:2px;height:14px;position:relative;overflow:hidden}
+.bar-fill{height:100%;border-radius:2px;background:#c9a84c}
+.bar-val{font-size:10px;color:#c9a84c;min-width:85px;text-align:right}
+.footer{text-align:center;font-size:10px;color:#3a4f65;padding:1rem;border-top:0.5px solid #2a3a4f;margin-top:1rem}
+@media(max-width:700px){
+  .cards{grid-template-columns:1fr 1fr}
+  .charts-row{grid-template-columns:1fr}
+  .header{flex-direction:column;gap:8px;text-align:center}
+  .inv-table{font-size:10px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="logo">
+      <div class="logo-circle">EB</div>
+      <div class="logo-text">
+        <h1>Estaiada Beira Rio</h1>
+        <p>AV. BEIRA RIO, 1185 – RUA DO PORTO, PIRACICABA</p>
+      </div>
+    </div>
+    <div class="header-title">DASHBOARD DE ESTOQUE • ABR/MAI 2026</div>
+  </div>
+
+  <div class="section">
+    <div class="cards">
+      <div class="card">
+        <div class="card-label">Valor total em estoque</div>
+        <div class="card-value">R$ 16.534,41</div>
+        <div class="card-sub">56 itens cadastrados</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Vence em até 7 dias</div>
+        <div class="card-value warn">8 itens</div>
+        <div class="card-sub">R$ 2.891,26 em risco</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Crítico (≤ 3 dias)</div>
+        <div class="card-value alert">4 itens</div>
+        <div class="card-sub">Atenção imediata necessária</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Fornecedores ativos</div>
+        <div class="card-value">12</div>
+        <div class="card-sub">Nesta semana</div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-panel">
+        <div class="panel-title">Valor por categoria</div>
+        <div style="position:relative;width:100%;height:220px">
+          <canvas id="catChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-panel">
+        <div class="panel-title">Distribuição por fornecedor</div>
+        <div id="fornBars"></div>
+      </div>
+    </div>
+
+    <div class="chart-panel" style="margin-bottom:1.25rem">
+      <div class="panel-title">Análise de vencimentos</div>
+      <div style="position:relative;width:100%;height:180px">
+        <canvas id="vencChart"></canvas>
+      </div>
+    </div>
+
+    <div class="table-panel">
+      <div class="panel-title" style="margin-bottom:10px">Inventário detalhado</div>
+      <div class="filters">
+        <select class="filter-btn" id="filterCat" onchange="filterTable()">
+          <option value="">Todas as categorias</option>
+          <option value="Frutos do Mar">Frutos do Mar</option>
+          <option value="Carnes">Carnes</option>
+          <option value="FLV">FLV</option>
+          <option value="Frios">Frios</option>
+          <option value="Secos">Secos</option>
+        </select>
+        <select class="filter-btn" id="filterStatus" onchange="filterTable()">
+          <option value="">Todos os status</option>
+          <option value="Crítico">Crítico</option>
+          <option value="Próximo">Próximo</option>
+          <option value="OK">OK</option>
+          <option value="À vista">À vista</option>
+        </select>
+      </div>
+      <table class="inv-table">
+        <thead>
+          <tr>
+            <th>Produto</th><th>Data entrada</th><th>Qtde (kg)</th>
+            <th>Valor unit. (R$)</th><th>Valor total (R$)</th>
+            <th>Vencimento</th><th>Fornecedor</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="invBody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="footer">Atualizado em 02/05/2026 • Estaiada Beira Rio • Dashboard gerado automaticamente</div>
+</div>
+
+<script>
+const inv = [
+  {prod:'Povo Baby',entrada:'23/04/2026',qtd:10,unit:21.99,total:219.90,venc:'30/04/2026',forn:'2 Peixinhos',cat:'Frutos do Mar',dias:-2},
+  {prod:'Tx Mignon',entrada:'25/04/2026',qtd:6,unit:45.90,total:275.40,venc:'À vista',forn:'Moça da Trouxinha',cat:'Carnes',dias:null},
+  {prod:'Tx Camarão',entrada:'25/04/2026',qtd:4,unit:48.90,total:195.60,venc:'À vista',forn:'Moça da Trouxinha',cat:'Frutos do Mar',dias:null},
+  {prod:'Tx Shimeji',entrada:'25/04/2026',qtd:2,unit:42.90,total:85.80,venc:'À vista',forn:'Moça da Trouxinha',cat:'FLV',dias:null},
+  {prod:'Morango',entrada:'26/04/2026',qtd:2,unit:45.00,total:90.00,venc:'À vista',forn:'Banca do Papai',cat:'FLV',dias:null},
+  {prod:'Abacaxi',entrada:'26/04/2026',qtd:2,unit:12.00,total:24.00,venc:'À vista',forn:'Banca do Papai',cat:'FLV',dias:null},
+  {prod:'Kiwi',entrada:'26/04/2026',qtd:4,unit:29.80,total:15.15,venc:'À vista',forn:'Banca do Papai',cat:'FLV',dias:null},
+  {prod:'Coentro',entrada:'26/04/2026',qtd:1,unit:5.00,total:5.00,venc:'À vista',forn:'Banca do Papai',cat:'FLV',dias:null},
+  {prod:'Pimentão Verm',entrada:'26/04/2026',qtd:6,unit:19.80,total:21.00,venc:'À vista',forn:'Banca do Papai',cat:'FLV',dias:null},
+  {prod:'Brócolis',entrada:'26/04/2026',qtd:6,unit:9.00,total:54.00,venc:'À vista',forn:'Banca do Papai',cat:'FLV',dias:null},
+  {prod:'Mignon',entrada:'27/04/2026',qtd:19,unit:93.00,total:1767.00,venc:'04/05/2026',forn:'Intercarne',cat:'Carnes',dias:2},
+  {prod:'Flores Comestíveis',entrada:'27/04/2026',qtd:3,unit:25.00,total:75.00,venc:'02/05/2026',forn:'Foschini',cat:'FLV',dias:0},
+  {prod:'Capuchinhas',entrada:'27/04/2026',qtd:4,unit:25.00,total:100.00,venc:'02/05/2026',forn:'Foschini',cat:'FLV',dias:0},
+  {prod:'Camarão Vermelho',entrada:'27/04/2026',qtd:5,unit:38.50,total:192.50,venc:'27/05/2026',forn:'Fcp pescados',cat:'Frutos do Mar',dias:25},
+  {prod:'Polaca do Alasca',entrada:'27/04/2026',qtd:5,unit:46.70,total:234.85,venc:'27/05/2026',forn:'Fcp pescados',cat:'Frutos do Mar',dias:25},
+  {prod:'Filé de Tilápia',entrada:'27/04/2026',qtd:39,unit:34.82,total:1357.98,venc:'05/05/2026',forn:'JAF Foods',cat:'Frutos do Mar',dias:3},
+  {prod:'Polvo Inteiro',entrada:'27/04/2026',qtd:10,unit:85.49,total:854.90,venc:'12/05/2026',forn:'JAF Foods',cat:'Frutos do Mar',dias:10},
+  {prod:'Cabeça de Lula',entrada:'27/04/2026',qtd:12,unit:16.99,total:203.88,venc:'12/05/2026',forn:'JAF Foods',cat:'Frutos do Mar',dias:10},
+  {prod:'Manta Surubim',entrada:'28/04/2026',qtd:13.7,unit:72.00,total:986.40,venc:'12/05/2026',forn:'Urizzi',cat:'Frutos do Mar',dias:10},
+  {prod:'Filé Salmão',entrada:'28/04/2026',qtd:3.6,unit:89.00,total:320.40,venc:'12/05/2026',forn:'Urizzi',cat:'Frutos do Mar',dias:10},
+  {prod:'Manta Filhote (fra.)',entrada:'28/04/2026',qtd:14,unit:65.00,total:942.50,venc:'12/05/2026',forn:'Urizzi',cat:'Frutos do Mar',dias:10},
+  {prod:'Manta Filhote (int.)',entrada:'28/04/2026',qtd:100,unit:65.00,total:6500.00,venc:'12/05/2026',forn:'Urizzi',cat:'Frutos do Mar',dias:10},
+  {prod:'Alface',entrada:'28/04/2026',qtd:6,unit:5.00,total:30.00,venc:'12/05/2026',forn:'Minas Frios',cat:'FLV',dias:10},
+  {prod:'Alface Roxa',entrada:'28/04/2026',qtd:6,unit:5.50,total:33.00,venc:'12/05/2026',forn:'Minas Frios',cat:'FLV',dias:10},
+  {prod:'Batata Asterix',entrada:'28/04/2026',qtd:20,unit:6.50,total:130.00,venc:'12/05/2026',forn:'Minas Frios',cat:'FLV',dias:10},
+  {prod:'Brócolis (MF)',entrada:'28/04/2026',qtd:8,unit:7.50,total:60.00,venc:'12/05/2026',forn:'Minas Frios',cat:'FLV',dias:10},
+  {prod:'Cebola',entrada:'28/04/2026',qtd:5,unit:3.25,total:16.25,venc:'12/05/2026',forn:'Minas Frios',cat:'FLV',dias:10},
+  {prod:'Cebolinha',entrada:'28/04/2026',qtd:1,unit:6.90,total:6.90,venc:'12/05/2026',forn:'Minas Frios',cat:'FLV',dias:10},
+  {prod:'Coentro (MF)',entrada:'28/04/2026',qtd:2,unit:6.90,total:13.80,venc:'12/05/2026',forn:'Minas Frios',cat:'FLV',dias:10},
+  {prod:'Limão Taiti',entrada:'28/04/2026',qtd:20,unit:3.50,total:70.00,venc:'12/05/2026',forn:'Minas Frios',cat:'FLV',dias:10},
+  {prod:'Manjericão',entrada:'28/04/2026',qtd:2,unit:12.00,total:24.00,venc:'12/05/2026',forn:'Minas Frios',cat:'FLV',dias:10},
+  {prod:'Pimentão Verde',entrada:'28/04/2026',qtd:0.45,unit:6.90,total:3.11,venc:'12/05/2026',forn:'Minas Frios',cat:'FLV',dias:10},
+  {prod:'Pimentão Vermelho',entrada:'28/04/2026',qtd:0.79,unit:11.90,total:9.40,venc:'12/05/2026',forn:'Minas Frios',cat:'FLV',dias:10},
+  {prod:'Rúcula',entrada:'28/04/2026',qtd:2,unit:6.00,total:12.00,venc:'12/05/2026',forn:'Minas Frios',cat:'FLV',dias:10},
+  {prod:'Salsão',entrada:'28/04/2026',qtd:1,unit:11.00,total:11.00,venc:'12/05/2026',forn:'Minas Frios',cat:'FLV',dias:10},
+  {prod:'Salsinha',entrada:'28/04/2026',qtd:3,unit:6.90,total:20.70,venc:'12/05/2026',forn:'Minas Frios',cat:'FLV',dias:10},
+  {prod:'Tomate Italiano',entrada:'28/04/2026',qtd:2,unit:5.50,total:11.00,venc:'12/05/2026',forn:'Minas Frios',cat:'FLV',dias:10},
+  {prod:'Tomate Molho',entrada:'28/04/2026',qtd:20,unit:4.90,total:98.00,venc:'12/05/2026',forn:'Minas Frios',cat:'FLV',dias:10},
+  {prod:'Tomilho',entrada:'28/04/2026',qtd:2,unit:8.50,total:17.00,venc:'12/05/2026',forn:'Minas Frios',cat:'FLV',dias:10},
+  {prod:'Farinha de Trigo',entrada:'28/04/2026',qtd:10,unit:3.39,total:33.90,venc:'04/05/2026',forn:'JACA Foods',cat:'Secos',dias:2},
+  {prod:'Óleo Misto',entrada:'28/04/2026',qtd:5,unit:60.27,total:301.35,venc:'05/05/2026',forn:'GaPeixoto',cat:'Secos',dias:3},
+  {prod:'Queijo Parmesão Vigor',entrada:'28/04/2026',qtd:3.81,unit:102.90,total:392.05,venc:'12/05/2026',forn:'Sanval',cat:'Frios',dias:10},
+  {prod:'Azeite de Oliva',entrada:'29/04/2026',qtd:1,unit:128.88,total:128.88,venc:'05/05/2026',forn:'GaPeixoto',cat:'Secos',dias:3},
+  {prod:'Açucar Refinado',entrada:'29/04/2026',qtd:1,unit:36.40,total:36.40,venc:'05/05/2026',forn:'JACA Foods',cat:'Secos',dias:3},
+  {prod:'Queijo Parmesão Ser.',entrada:'29/04/2026',qtd:3.85,unit:81.90,total:318.18,venc:'12/05/2026',forn:'Sanval',cat:'Frios',dias:10},
+  {prod:'Leite de Coco',entrada:'30/04/2026',qtd:12,unit:23.72,total:284.64,venc:'05/05/2026',forn:'GaPeixoto',cat:'Secos',dias:3},
+  {prod:'Queijo Mussarela',entrada:'30/04/2026',qtd:2.89,unit:47.90,total:138.43,venc:'12/05/2026',forn:'Sanval',cat:'Frios',dias:10},
+  {prod:'Farinha para empanar',entrada:'30/04/2026',qtd:10,unit:14.60,total:146.00,venc:'06/05/2026',forn:'JACA Foods',cat:'Secos',dias:4},
+  {prod:'Arroz Camil',entrada:'01/05/2026',qtd:4,unit:25.17,total:100.68,venc:'07/05/2026',forn:'JACA Foods',cat:'Secos',dias:5},
+  {prod:'Catchup',entrada:'01/05/2026',qtd:1,unit:31.18,total:31.18,venc:'05/05/2026',forn:'GaPeixoto',cat:'Secos',dias:3},
+  {prod:'Queijo Gorgonzola',entrada:'01/05/2026',qtd:2.82,unit:57.90,total:163.28,venc:'15/05/2026',forn:'Sanval',cat:'Frios',dias:13},
+  {prod:'Maionese',entrada:'02/05/2026',qtd:2,unit:42.09,total:84.18,venc:'05/05/2026',forn:'GaPeixoto',cat:'Secos',dias:3},
+  {prod:'Queijo Brie',entrada:'02/05/2026',qtd:1.15,unit:68.60,total:78.89,venc:'15/05/2026',forn:'Sanval',cat:'Frios',dias:13},
+  {prod:'Creme de Leite',entrada:'03/05/2026',qtd:8,unit:44.90,total:359.20,venc:'15/05/2026',forn:'Sanval',cat:'Frios',dias:13},
+];
+
+function getStatus(dias){
+  if(dias===null)return'À vista';
+  if(dias<=0)return'Crítico';
+  if(dias<=3)return'Crítico';
+  if(dias<=7)return'Próximo';
+  return'OK';
+}
+function getBadge(st){
+  if(st==='Crítico')return'<span class="badge badge-crit">✕ Crítico</span>';
+  if(st==='Próximo')return'<span class="badge badge-prox">▲ Próximo</span>';
+  if(st==='À vista')return'<span class="badge badge-vista">À vista</span>';
+  return'<span class="badge badge-ok">✓ OK</span>';
+}
+function renderTable(data){
+  document.getElementById('invBody').innerHTML=data.map(r=>{
+    const st=getStatus(r.dias);
+    const vl=r.venc+(r.dias!==null&&r.dias>0?` (${r.dias}d)`:r.dias!==null&&r.dias<0?' (vencido)':r.dias===0?' (hoje)':'');
+    return`<tr><td>${r.prod}</td><td>${r.entrada}</td><td style="text-align:right">${r.qtd}</td><td style="text-align:right">R$ ${r.unit.toFixed(2)}</td><td class="gold" style="text-align:right">R$ ${r.total.toLocaleString('pt-BR',{minimumFractionDigits:2})}</td><td>${vl}</td><td>${r.forn}</td><td>${getBadge(st)}</td></tr>`;
+  }).join('');
+}
+function filterTable(){
+  const cat=document.getElementById('filterCat').value;
+  const st=document.getElementById('filterStatus').value;
+  let f=inv;
+  if(cat)f=f.filter(r=>r.cat===cat);
+  if(st)f=f.filter(r=>getStatus(r.dias)===st);
+  renderTable(f);
+}
+renderTable(inv);
+
+const cats=['Frutos do Mar','Carnes','FLV','Frios','Secos'];
+const catVals=cats.map(c=>inv.filter(r=>r.cat===c).reduce((a,r)=>a+r.total,0));
+new Chart(document.getElementById('catChart'),{
+  type:'bar',
+  data:{labels:cats,datasets:[{data:catVals,backgroundColor:['#c9a84c','#7a9fc0','#50c878','#e8834c','#c070e0'],borderRadius:4}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' R$ '+ctx.raw.toLocaleString('pt-BR',{minimumFractionDigits:2})}}},scales:{x:{ticks:{color:'#7a8fa6',font:{size:11}},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#7a8fa6',font:{size:10},callback:v=>'R$'+(v/1000).toFixed(0)+'k'},grid:{color:'rgba(255,255,255,0.07)'}}}}
+});
+
+const vg=[
+  {label:'Vencido',count:inv.filter(r=>r.dias!==null&&r.dias<0).length,color:'#e84c4c'},
+  {label:'Hoje/Amanhã',count:inv.filter(r=>r.dias!==null&&r.dias>=0&&r.dias<=1).length,color:'#e8834c'},
+  {label:'3-7 dias',count:inv.filter(r=>r.dias!==null&&r.dias>=2&&r.dias<=7).length,color:'#e8c84c'},
+  {label:'8-14 dias',count:inv.filter(r=>r.dias!==null&&r.dias>=8&&r.dias<=14).length,color:'#50c878'},
+  {label:'15+ dias',count:inv.filter(r=>r.dias!==null&&r.dias>=15).length,color:'#7a9fc0'},
+  {label:'Sem data',count:inv.filter(r=>r.dias===null).length,color:'#9a8fc0'},
+];
+new Chart(document.getElementById('vencChart'),{
+  type:'bar',
+  data:{labels:vg.map(v=>v.label),datasets:[{data:vg.map(v=>v.count),backgroundColor:vg.map(v=>v.color),borderRadius:4}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.raw+' itens'}}},scales:{x:{ticks:{color:'#7a8fa6',font:{size:11}},grid:{display:false}},y:{ticks:{color:'#7a8fa6',font:{size:11},stepSize:3},grid:{color:'rgba(255,255,255,0.07)'}}}}
+});
+
+const fornMap={};
+inv.forEach(r=>{fornMap[r.forn]=(fornMap[r.forn]||0)+r.total;});
+const fs=Object.entries(fornMap).sort((a,b)=>b[1]-a[1]);
+const mx=fs[0][1];
+document.getElementById('fornBars').innerHTML=fs.map(([n,v])=>`<div class="bar-row"><div class="bar-label">${n.length>14?n.slice(0,13)+'…':n}</div><div class="bar-track"><div class="bar-fill" style="width:${(v/mx*100).toFixed(1)}%"></div></div><div class="bar-val">R$ ${v.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div>`).join('');
+</script>
+</body>
+</html>
